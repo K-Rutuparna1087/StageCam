@@ -1,0 +1,12 @@
+README.md
+setup.py
+stagecam/__init__.py
+stagecam/face_tracker.py
+stagecam/frame_transformer.py
+stagecam/stagecam.py
+stagecam.egg-info/PKG-INFO
+stagecam.egg-info/SOURCES.txt
+stagecam.egg-info/dependency_links.txt
+stagecam.egg-info/entry_points.txt
+stagecam.egg-info/requires.txt
+stagecam.egg-info/top_level.txt
