@@ -63,18 +63,44 @@ stagecam.show(
 
 ```python
 import cv2
-import stagecam
+from stagecam import FaceTracker, FrameTransformer
 
-cap = cv2.VideoCapture(0)
-stagecam_feed = stagecam.get_stagecam_feed(camera_index=0)
+def main():
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("❌ Error: Cannot access camera.")
+        return
 
-while True:
-    ret, original = cap.read()
-    staged = stagecam_feed(original.copy())
-    combined = cv2.hconcat([original, staged])
-    cv2.imshow("Original (left) | StageCam (right)", combined)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    ret, frame = cap.read()
+    if not ret:
+        print("❌ Error: Cannot read from camera.")
+        return
+
+    frame_height, frame_width = frame.shape[:2]
+    tracker = FaceTracker()
+    transformer = FrameTransformer(frame_width, frame_height)
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        flipped = cv2.flip(frame, 1)
+        bboxes = tracker.detect(flipped)
+        staged = transformer.transform(flipped.copy(), bboxes)
+
+        combined = cv2.hconcat([flipped, staged])
+        cv2.imshow("Original (left) | StageCam (right)", combined)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
+
 ```
 
 ---
