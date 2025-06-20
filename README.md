@@ -8,34 +8,39 @@
 
 StageCam is built for:
 
-* 💻 **Virtual meetings** – Auto-center your face even if you move
-* 🤖 **Robotics/Embedded Vision** – Add camera intelligence to your bots
-* 🎬 **Livestreams & Screen Recording** – Look pro with automatic framing
-* 🧠 **Python Apps** – Integrate real-time face tracking with ease
+* 💻 **Virtual Meetings** – Auto-center your face, even when you move
+* 🤖 **Robotics / Embedded Vision** – Add smart framing to robots or IoT cameras
+* 🎬 **Livestreams & Screen Recording** – Look polished without manual setup
+* 🧠 **Any Python App** – Easily integrate real-time face framing
 
 ---
 
 ## ✨ Features
 
-* 🧠 **MediaPipe-based Face Detection** (lightweight & accurate)
-* 🎯 **Smooth Pan & Zoom** – No jerky motion
-* 👥 **Multi-face Adaptive Framing**
-* 🪞 **Lateral Inversion** – Just like standard webcams
-* 🧩 **Modular API** – Import and customize as needed
+* 🧠 **MediaPipe-based Face Detection** – Lightweight yet accurate
+* 🎯 **Smooth Pan & Zoom** – Fluid, jitter-free movement
+* 👥 **Multi-face Framing** – Dynamically adapts to multiple faces
+* 🪞 **Lateral Inversion** – Natural webcam-like mirroring
+* 🧩 **Modular API** – Use as a script or drop into your own project
 
 ---
 
 ## 📦 Installation
 
+🔗 [PyPI: stagecam](https://pypi.org/project/stagecam)
+
+```bash
+pip install stagecam
+```
+
+Or install directly from GitHub:
+
 ```bash
 pip install git+https://github.com/K-Rutuparna1087/StageCam.git
 ```
 
-**Dependencies** (auto-installed):
-
-* `opencv-python`
-* `mediapipe`
-* `numpy`
+**Dependencies (auto-installed):**
+`opencv-python`, `mediapipe`, `numpy`
 
 ---
 
@@ -47,7 +52,7 @@ import stagecam
 stagecam.show()
 ```
 
-**Optional Parameters:**
+With optional arguments:
 
 ```python
 stagecam.show(
@@ -65,49 +70,37 @@ stagecam.show(
 import cv2
 from stagecam import FaceTracker, FrameTransformer
 
-def main():
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("❌ Error: Cannot access camera.")
-        return
+cap = cv2.VideoCapture(0)
+ret, frame = cap.read()
 
+frame_height, frame_width = frame.shape[:2]
+tracker = FaceTracker()
+transformer = FrameTransformer(frame_width, frame_height)
+
+while True:
     ret, frame = cap.read()
     if not ret:
-        print("❌ Error: Cannot read from camera.")
-        return
+        break
 
-    frame_height, frame_width = frame.shape[:2]
-    tracker = FaceTracker()
-    transformer = FrameTransformer(frame_width, frame_height)
+    flipped = cv2.flip(frame, 1)
+    bboxes = tracker.detect(flipped)
+    staged = transformer.transform(flipped.copy(), bboxes)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+    combined = cv2.hconcat([flipped, staged])
+    cv2.imshow("Original (left) | StageCam (right)", combined)
 
-        flipped = cv2.flip(frame, 1)
-        bboxes = tracker.detect(flipped)
-        staged = transformer.transform(flipped.copy(), bboxes)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
-        combined = cv2.hconcat([flipped, staged])
-        cv2.imshow("Original (left) | StageCam (right)", combined)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-if __name__ == "__main__":
-    main()
-
+cap.release()
+cv2.destroyAllWindows()
 ```
 
 ---
 
 ## 🔧 Build Your Own System
 
-Import core components and customize:
+Use the core modules independently:
 
 ```python
 from stagecam import FaceTracker, FrameTransformer
@@ -117,23 +110,23 @@ from stagecam import FaceTracker, FrameTransformer
 
 ## 🛣️ Roadmap
 
-* 📷 Virtual Webcam Output (via `v4l2loopback` / OBS)
-* 🖱️ GUI toggle controls
-* 📦 PyPI publishing (`pip install stagecam`)
-* 📱 Mobile-friendly version (future goal)
+* 📷 Virtual webcam output (v4l2loopback / OBS)
+* 🖱️ GUI controls for zoom/pan toggle
+* 📦 Stable PyPI support and versioning
+* 📱 Mobile device support
 
 ---
 
 ## 👤 Author
 
-Made with ❤️ by **K Rutuparna**
-🔧 Mechatronics Engineer | 🤖 Robotics + AI Vision Enthusiast
-🌐 GitHub: [K-Rutuparna1087](https://github.com/K-Rutuparna1087)
+**K Rutuparna**
+Mechatronics Engineer | Robotics + AI Vision Enthusiast
+🌐 [GitHub – K-Rutuparna1087](https://github.com/K-Rutuparna1087)
 
 ---
 
 ## ⚖️ License
 
-**MIT License** – Free to use, modify, and distribute.
+Licensed under the **MIT License** – Free to use, modify, and distribute.
 
 ---
